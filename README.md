@@ -16,7 +16,7 @@ Aplikasi arisan digital dengan sistem **gacha live** yang transparan, seru, dan 
 - Randomizer: Chainlink VRF
 
 ## 🚀 Status
-🚧 Dalam pengembangan
+🚧 Dalam pengembangan Dharma-labs
 
 ## 📝 Lisensi
 MIT License - lihat file [LICENSE](LICENSE)
