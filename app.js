@@ -1,3 +1,7 @@
+// ===== KONFIGURASI =====
+const ADMIN_PIN = '1234'; // PIN admin default, bisa diganti
+const ADMIN_WA = '6285811200013'; // WhatsApp admin (Wawan)
+
 // ===== DATA =====
 let data = JSON.parse(localStorage.getItem('arisan-data') || JSON.stringify({
   pengaturan: { nama: 'Arisan Gacha', iuran: 500000 },
@@ -5,8 +9,35 @@ let data = JSON.parse(localStorage.getItem('arisan-data') || JSON.stringify({
   riwayat: []
 }));
 
+let isAdmin = false;
+
 function simpan() {
   localStorage.setItem('arisan-data', JSON.stringify(data));
+}
+
+// ===== LOGIN ADMIN =====
+function cekAdmin() {
+  const pin = prompt('Masukkan PIN Admin:');
+  if (pin === ADMIN_PIN) {
+    isAdmin = true;
+    localStorage.setItem('admin-session', Date.now());
+    alert('✅ Login admin berhasil!');
+    renderAll();
+  } else if (pin !== null) {
+    alert('❌ PIN salah!');
+  }
+}
+
+function logout() {
+  isAdmin = false;
+  localStorage.removeItem('admin-session');
+  renderAll();
+}
+
+// Cek session admin (valid 8 jam)
+const adminSession = localStorage.getItem('admin-session');
+if (adminSession && (Date.now() - parseInt(adminSession)) < 8 * 60 * 60 * 1000) {
+  isAdmin = true;
 }
 
 // ===== TABS =====
@@ -20,6 +51,7 @@ function showTab(tab, el) {
 
 // ===== PENGATURAN =====
 function simpanPengaturan() {
+  if (!isAdmin) return alert('Hanya admin yang bisa mengubah pengaturan!');
   const nama = document.getElementById('nama-grup').value.trim();
   const iuran = parseInt(document.getElementById('iuran').value);
   if (!nama) return alert('Nama grup harus diisi!');
@@ -32,6 +64,7 @@ function simpanPengaturan() {
 
 // ===== ANGGOTA =====
 function tambahAnggota() {
+  if (!isAdmin) return alert('Hanya admin yang bisa menambah anggota!');
   const nama = document.getElementById('nama-anggota').value.trim();
   const hp = document.getElementById('no-hp').value.trim();
   if (!nama) return alert('Nama anggota harus diisi!');
@@ -45,6 +78,7 @@ function tambahAnggota() {
 }
 
 function hapusAnggota(id) {
+  if (!isAdmin) return alert('Hanya admin yang bisa menghapus anggota!');
   if (!confirm('Hapus anggota ini?')) return;
   data.anggota = data.anggota.filter(a => a.id !== id);
   simpan();
@@ -56,23 +90,69 @@ function hapusAnggota(id) {
 function renderAnggota() {
   const el = document.getElementById('list-anggota');
   if (!data.anggota.length) { el.innerHTML = '<p class="empty">Belum ada anggota</p>'; return; }
-  el.innerHTML = data.anggota.map(a => `
+
+  const adminBadge = isAdmin
+    ? `<div class="admin-badge">🔑 Mode Admin</div>`
+    : `<div class="admin-badge viewer">👁️ Mode Viewer — <a href="#" onclick="cekAdmin()">Login Admin</a></div>`;
+
+  el.innerHTML = adminBadge + data.anggota.map(a => `
     <div class="anggota-item">
       <div class="avatar">${a.nama[0].toUpperCase()}</div>
       <div class="anggota-info">
         <div class="nama">${a.nama}</div>
-        <div class="hp">${a.hp || '-'}</div>
+        <div class="hp">${a.hp ? formatHP(a.hp) : 'No HP tidak ada'}</div>
       </div>
       <span class="badge ${a.sudahDapat ? 'badge-sudah' : 'badge-belum'}">
-        ${a.sudahDapat ? '✅ Sudah' : '⏳ Belum'}
+        ${a.sudahDapat ? '✅' : '⏳'}
       </span>
-      <button class="btn-hapus" onclick="hapusAnggota(${a.id})">🗑️</button>
+      ${isAdmin ? `<button class="btn-hapus" onclick="hapusAnggota(${a.id})">🗑️</button>` : ''}
     </div>
   `).join('');
 }
 
+function formatHP(hp) {
+  // Format nomor HP ke format internasional
+  let clean = hp.replace(/\D/g, '');
+  if (clean.startsWith('0')) clean = '62' + clean.slice(1);
+  return '+' + clean;
+}
+
+function hpToWA(hp) {
+  let clean = hp.replace(/\D/g, '');
+  if (clean.startsWith('0')) clean = '62' + clean.slice(1);
+  return clean;
+}
+
+// ===== FORM ADMIN =====
+function renderFormAdmin() {
+  const el = document.getElementById('form-admin');
+  if (!el) return;
+  if (isAdmin) {
+    el.innerHTML = `
+      <div class="card admin-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px">
+          <h2>➕ Tambah Anggota</h2>
+          <button class="btn-logout" onclick="logout()">🚪 Logout</button>
+        </div>
+        <input type="text" id="nama-anggota" placeholder="Nama anggota" />
+        <input type="tel" id="no-hp" placeholder="No. HP / WhatsApp (misal: 08123456789)" />
+        <button class="btn-primary" onclick="tambahAnggota()">➕ Tambah Anggota</button>
+      </div>
+    `;
+  } else {
+    el.innerHTML = `
+      <div class="card">
+        <div style="text-align:center;padding:10px">
+          <p style="color:#888;margin-bottom:15px">🔒 Tambah anggota hanya untuk admin</p>
+          <button class="btn-primary" onclick="cekAdmin()" style="width:auto;padding:10px 30px">🔑 Login Admin</button>
+        </div>
+      </div>
+    `;
+  }
+}
+
 // ===== TABUNG =====
-const ITEM_HEIGHT = 56; // px, harus sama dengan CSS
+const ITEM_HEIGHT = 56;
 const VISIBLE_ITEMS = 5;
 const CENTER_INDEX = Math.floor(VISIBLE_ITEMS / 2);
 
@@ -81,27 +161,27 @@ function renderTube() {
   const hint = document.getElementById('hint-peserta');
   const btn = document.getElementById('btn-undian');
   const tube = document.getElementById('tube-inner');
+  if (!tube) return;
 
   if (belum.length === 0) {
-    hint.textContent = 'Semua anggota sudah mendapatkan arisan!';
-    btn.disabled = true;
+    if (hint) hint.textContent = 'Semua anggota sudah mendapatkan arisan!';
+    if (btn) btn.disabled = true;
     tube.innerHTML = '<div class="tube-name-item" style="color:#f5c518">🏆 Selesai!</div>';
     return;
   }
 
-  hint.textContent = `${belum.length} peserta belum mendapatkan arisan`;
-  btn.disabled = false;
+  if (hint) hint.textContent = `${belum.length} peserta belum mendapatkan arisan`;
+  if (btn) btn.disabled = false;
 
-  // Buat list panjang untuk ilusi scroll: duplikasi nama
   const pool = [];
   for (let i = 0; i < 5; i++) pool.push(...belum.map(a => a.nama));
 
-  tube.innerHTML = pool.map((nama, i) =>
-    `<div class="tube-name-item" id="ti-${i}">${nama}</div>`
+  tube.innerHTML = pool.map(nama =>
+    `<div class="tube-name-item">${nama}</div>`
   ).join('');
 
-  // Posisikan ke tengah pool
   const startIndex = Math.floor(pool.length / 2);
+  tube.style.transition = 'none';
   tube.style.transform = `translateY(-${(startIndex - CENTER_INDEX) * ITEM_HEIGHT}px)`;
 }
 
@@ -121,61 +201,79 @@ function mulaiUndian() {
   btn.textContent = '⏳ Mengundi...';
   resultBox.classList.add('hidden');
 
-  // Pilih pemenang terlebih dahulu
   const pemenang = belum[Math.floor(Math.random() * belum.length)];
 
-  // Buat pool besar — targetkan pemenang di posisi tengah di akhir
   const pool = [];
   for (let i = 0; i < 8; i++) pool.push(...belum.map(a => a.nama));
-  // Tambahkan pemenang di dekat akhir pool
   pool.push(pemenang.nama);
 
   tube.innerHTML = pool.map(nama =>
     `<div class="tube-name-item">${nama}</div>`
   ).join('');
 
-  // Durasi animasi: 5 detik
   const duration = 5000;
   const totalItems = pool.length;
-  const targetIndex = totalItems - 1; // pemenang di akhir
+  const targetIndex = totalItems - 1;
 
-  // Mulai dari awal pool
   let startOffset = CENTER_INDEX * ITEM_HEIGHT;
   tube.style.transition = 'none';
   tube.style.transform = `translateY(${startOffset}px)`;
-
-  // Force reflow
   tube.getBoundingClientRect();
 
-  // Animasi ke target
   const targetOffset = (CENTER_INDEX - targetIndex) * ITEM_HEIGHT;
   tube.style.transition = `transform ${duration}ms cubic-bezier(0.23, 1, 0.32, 1)`;
   tube.style.transform = `translateY(${targetOffset}px)`;
 
   setTimeout(() => {
-    // Tampilkan hasil
     btn.textContent = '🎰 PUTAR TABUNG!';
     btn.disabled = false;
     isSpinning = false;
 
-    // Update data
     const idx = data.anggota.findIndex(a => a.id === pemenang.id);
     data.anggota[idx].sudahDapat = true;
+    const noPemenang = data.riwayat.length + 1;
+    const totalHadiah = data.pengaturan.iuran * data.anggota.length;
     data.riwayat.push({
-      no: data.riwayat.length + 1,
+      no: noPemenang,
       nama: pemenang.nama,
+      hp: pemenang.hp || '',
       tanggal: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }),
-      total: data.pengaturan.iuran * data.anggota.length
+      total: totalHadiah
     });
     simpan();
 
-    // Tampilkan result box
+    // Tampilkan result
     document.getElementById('result-nama').textContent = '🏆 ' + pemenang.nama;
     document.getElementById('result-sub').textContent =
-      `Mendapatkan arisan ke-${data.riwayat.length} • Rp ${(data.pengaturan.iuran * data.anggota.length).toLocaleString('id-ID')}`;
-    resultBox.classList.remove('hidden');
+      `Arisan ke-${noPemenang} • Rp ${totalHadiah.toLocaleString('id-ID')}`;
 
-    // Re-render tabung
+    // Tombol WA ke pemenang
+    const waBtn = document.getElementById('btn-wa-pemenang');
+    const waBtnAdmin = document.getElementById('btn-wa-admin');
+    if (pemenang.hp) {
+      const waNum = hpToWA(pemenang.hp);
+      const pesanPemenang = encodeURIComponent(
+        `🎉 Selamat ${pemenang.nama}!\n\nAnda memenangkan Arisan *${data.pengaturan.nama}* periode ke-${noPemenang}.\n\nTotal hadiah: Rp ${totalHadiah.toLocaleString('id-ID')}\n\nSilakan hubungi admin untuk pencairan. 🎊`
+      );
+      waBtn.href = `https://wa.me/${waNum}?text=${pesanPemenang}`;
+      waBtn.style.display = 'inline-flex';
+    } else {
+      waBtn.style.display = 'none';
+    }
+
+    // Notif ke admin
+    const pesanAdmin = encodeURIComponent(
+      `🎰 *HASIL UNDIAN ARISAN*\n\n` +
+      `Grup: ${data.pengaturan.nama}\n` +
+      `Pemenang: *${pemenang.nama}*\n` +
+      `${pemenang.hp ? 'No HP: ' + formatHP(pemenang.hp) + '\n' : ''}` +
+      `Hadiah: Rp ${totalHadiah.toLocaleString('id-ID')}\n` +
+      `Periode: ke-${noPemenang}\n` +
+      `Tanggal: ${new Date().toLocaleDateString('id-ID', {day:'numeric',month:'long',year:'numeric'})}`
+    );
+    waBtnAdmin.href = `https://wa.me/${ADMIN_WA}?text=${pesanAdmin}`;
+
+    resultBox.classList.remove('hidden');
     setTimeout(renderTube, 1200);
     renderBeranda();
   }, duration + 100);
@@ -185,15 +283,23 @@ function mulaiUndian() {
 function renderRiwayat() {
   const el = document.getElementById('list-riwayat');
   if (!data.riwayat.length) { el.innerHTML = '<p class="empty">Belum ada undian</p>'; return; }
-  el.innerHTML = [...data.riwayat].reverse().map(r => `
-    <div class="riwayat-item">
-      <div class="riwayat-no">${r.no}</div>
-      <div class="riwayat-info">
-        <div class="nama">🏆 ${r.nama}</div>
-        <div class="tgl">${r.tanggal} — Rp ${(r.total||0).toLocaleString('id-ID')}</div>
+  el.innerHTML = [...data.riwayat].reverse().map(r => {
+    const waLink = r.hp ? (() => {
+      const waNum = hpToWA(r.hp);
+      const pesan = encodeURIComponent(`Halo ${r.nama}, ini konfirmasi arisan ke-${r.no} 🎉`);
+      return `<a class="btn-wa-kecil" href="https://wa.me/${waNum}?text=${pesan}" target="_blank">💬 WA</a>`;
+    })() : '';
+    return `
+      <div class="riwayat-item">
+        <div class="riwayat-no">${r.no}</div>
+        <div class="riwayat-info">
+          <div class="nama">🏆 ${r.nama}</div>
+          <div class="tgl">${r.tanggal} — Rp ${(r.total||0).toLocaleString('id-ID')}</div>
+        </div>
+        ${waLink}
       </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
 // ===== BERANDA =====
@@ -207,10 +313,13 @@ function renderBeranda() {
   document.getElementById('nama-grup').value = data.pengaturan.nama;
   document.getElementById('iuran').value = data.pengaturan.iuran;
   document.getElementById('subtitle-nama').textContent = data.pengaturan.nama;
+  const btnSimpan = document.getElementById('btn-simpan-setting');
+  if (btnSimpan) btnSimpan.style.display = isAdmin ? 'block' : 'none';
 }
 
 // ===== RESET =====
 function resetArisan() {
+  if (!isAdmin) return alert('Hanya admin yang bisa reset!');
   if (!confirm('Reset semua data untuk periode baru? Riwayat akan dihapus.')) return;
   data.anggota = data.anggota.map(a => ({ ...a, sudahDapat: false }));
   data.riwayat = [];
@@ -221,6 +330,7 @@ function resetArisan() {
 
 function renderAll() {
   renderBeranda();
+  renderFormAdmin();
   renderAnggota();
   renderRiwayat();
   renderTube();
