@@ -224,3 +224,46 @@ label { display: block; font-size: 0.85em; color: #666; margin-bottom: 5px; marg
 .riwayat-info .nama { font-weight: bold; }
 .riwayat-info .tgl { font-size: 0.8em; color: #888; }
 .empty { text-align: center; color: #aaa; padding: 20px; }
+
+/* ====== ADMIN ====== */
+.admin-card { border: 2px solid #764ba2; }
+.admin-badge {
+  background: #764ba2; color: white;
+  padding: 6px 12px; border-radius: 20px;
+  font-size: 0.8em; font-weight: bold;
+  display: inline-block; margin-bottom: 12px;
+}
+.admin-badge.viewer {
+  background: #f0f0f0; color: #666;
+}
+.admin-badge.viewer a { color: #764ba2; font-weight: bold; }
+
+.btn-logout {
+  padding: 6px 14px;
+  background: #ff4757; color: white;
+  border: none; border-radius: 20px;
+  font-size: 0.8em; cursor: pointer;
+}
+
+/* ====== RESULT WA BUTTONS ====== */
+.result-actions {
+  display: flex; flex-direction: column; gap: 10px;
+  margin-top: 15px;
+}
+.btn-wa-result {
+  display: flex; align-items: center; justify-content: center;
+  padding: 12px; border-radius: 10px;
+  background: #25D366; color: white;
+  text-decoration: none; font-weight: bold;
+  font-size: 0.95em;
+}
+.btn-wa-result.secondary { background: rgba(255,255,255,0.2); }
+
+/* ====== RIWAYAT WA BUTTON ====== */
+.btn-wa-kecil {
+  padding: 5px 12px;
+  background: #25D366; color: white;
+  border-radius: 20px; text-decoration: none;
+  font-size: 0.78em; font-weight: bold;
+  white-space: nowrap;
+}
