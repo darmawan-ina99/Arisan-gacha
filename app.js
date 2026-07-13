@@ -10,11 +10,11 @@ function simpan() {
 }
 
 // ===== TABS =====
-function showTab(tab) {
+function showTab(tab, el) {
   document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById('tab-' + tab).classList.add('active');
-  event.target.classList.add('active');
+  if (el) el.classList.add('active');
   renderAll();
 }
 
@@ -25,6 +25,7 @@ function simpanPengaturan() {
   if (!nama) return alert('Nama grup harus diisi!');
   data.pengaturan = { nama, iuran: iuran || 500000 };
   simpan();
+  document.getElementById('subtitle-nama').textContent = nama;
   alert('✅ Pengaturan disimpan!');
   renderBeranda();
 }
@@ -40,6 +41,7 @@ function tambahAnggota() {
   document.getElementById('no-hp').value = '';
   renderAnggota();
   renderBeranda();
+  renderTube();
 }
 
 function hapusAnggota(id) {
@@ -48,14 +50,12 @@ function hapusAnggota(id) {
   simpan();
   renderAnggota();
   renderBeranda();
+  renderTube();
 }
 
 function renderAnggota() {
   const el = document.getElementById('list-anggota');
-  if (data.anggota.length === 0) {
-    el.innerHTML = '<p class="empty">Belum ada anggota</p>';
-    return;
-  }
+  if (!data.anggota.length) { el.innerHTML = '<p class="empty">Belum ada anggota</p>'; return; }
   el.innerHTML = data.anggota.map(a => `
     <div class="anggota-item">
       <div class="avatar">${a.nama[0].toUpperCase()}</div>
@@ -71,74 +71,126 @@ function renderAnggota() {
   `).join('');
 }
 
+// ===== TABUNG =====
+const ITEM_HEIGHT = 56; // px, harus sama dengan CSS
+const VISIBLE_ITEMS = 5;
+const CENTER_INDEX = Math.floor(VISIBLE_ITEMS / 2);
+
+function renderTube() {
+  const belum = data.anggota.filter(a => !a.sudahDapat);
+  const hint = document.getElementById('hint-peserta');
+  const btn = document.getElementById('btn-undian');
+  const tube = document.getElementById('tube-inner');
+
+  if (belum.length === 0) {
+    hint.textContent = 'Semua anggota sudah mendapatkan arisan!';
+    btn.disabled = true;
+    tube.innerHTML = '<div class="tube-name-item" style="color:#f5c518">🏆 Selesai!</div>';
+    return;
+  }
+
+  hint.textContent = `${belum.length} peserta belum mendapatkan arisan`;
+  btn.disabled = false;
+
+  // Buat list panjang untuk ilusi scroll: duplikasi nama
+  const pool = [];
+  for (let i = 0; i < 5; i++) pool.push(...belum.map(a => a.nama));
+
+  tube.innerHTML = pool.map((nama, i) =>
+    `<div class="tube-name-item" id="ti-${i}">${nama}</div>`
+  ).join('');
+
+  // Posisikan ke tengah pool
+  const startIndex = Math.floor(pool.length / 2);
+  tube.style.transform = `translateY(-${(startIndex - CENTER_INDEX) * ITEM_HEIGHT}px)`;
+}
+
 // ===== UNDIAN =====
 let isSpinning = false;
 
 function mulaiUndian() {
   const belum = data.anggota.filter(a => !a.sudahDapat);
-  if (belum.length === 0) {
-    alert('Semua anggota sudah mendapatkan arisan! Reset untuk periode baru.');
-    return;
-  }
-  if (isSpinning) return;
+  if (!belum.length || isSpinning) return;
 
   isSpinning = true;
   const btn = document.getElementById('btn-undian');
-  const drum = document.getElementById('drum');
-  const display = document.getElementById('drum-display');
-  const status = document.getElementById('status-undian');
+  const tube = document.getElementById('tube-inner');
+  const resultBox = document.getElementById('result-box');
 
   btn.disabled = true;
   btn.textContent = '⏳ Mengundi...';
-  status.textContent = '';
-  drum.classList.add('spinning');
+  resultBox.classList.add('hidden');
 
-  let count = 0;
-  const interval = setInterval(() => {
-    const random = belum[Math.floor(Math.random() * belum.length)];
-    display.textContent = random.nama;
-    count++;
-    if (count > 30) {
-      clearInterval(interval);
-      drum.classList.remove('spinning');
+  // Pilih pemenang terlebih dahulu
+  const pemenang = belum[Math.floor(Math.random() * belum.length)];
 
-      // Pilih pemenang
-      const pemenang = belum[Math.floor(Math.random() * belum.length)];
-      display.textContent = '🎉 ' + pemenang.nama;
-      status.textContent = `Selamat ${pemenang.nama}! Mendapatkan arisan ke-${data.riwayat.length + 1}`;
+  // Buat pool besar — targetkan pemenang di posisi tengah di akhir
+  const pool = [];
+  for (let i = 0; i < 8; i++) pool.push(...belum.map(a => a.nama));
+  // Tambahkan pemenang di dekat akhir pool
+  pool.push(pemenang.nama);
 
-      // Update data
-      const idx = data.anggota.findIndex(a => a.id === pemenang.id);
-      data.anggota[idx].sudahDapat = true;
-      data.riwayat.push({
-        no: data.riwayat.length + 1,
-        nama: pemenang.nama,
-        tanggal: new Date().toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' }),
-        iuran: data.pengaturan.iuran * data.anggota.length
-      });
-      simpan();
+  tube.innerHTML = pool.map(nama =>
+    `<div class="tube-name-item">${nama}</div>`
+  ).join('');
 
-      btn.disabled = false;
-      btn.textContent = '🎰 MULAI UNDIAN!';
-      isSpinning = false;
-      renderBeranda();
-    }
-  }, 80);
+  // Durasi animasi: 5 detik
+  const duration = 5000;
+  const totalItems = pool.length;
+  const targetIndex = totalItems - 1; // pemenang di akhir
+
+  // Mulai dari awal pool
+  let startOffset = CENTER_INDEX * ITEM_HEIGHT;
+  tube.style.transition = 'none';
+  tube.style.transform = `translateY(${startOffset}px)`;
+
+  // Force reflow
+  tube.getBoundingClientRect();
+
+  // Animasi ke target
+  const targetOffset = (CENTER_INDEX - targetIndex) * ITEM_HEIGHT;
+  tube.style.transition = `transform ${duration}ms cubic-bezier(0.23, 1, 0.32, 1)`;
+  tube.style.transform = `translateY(${targetOffset}px)`;
+
+  setTimeout(() => {
+    // Tampilkan hasil
+    btn.textContent = '🎰 PUTAR TABUNG!';
+    btn.disabled = false;
+    isSpinning = false;
+
+    // Update data
+    const idx = data.anggota.findIndex(a => a.id === pemenang.id);
+    data.anggota[idx].sudahDapat = true;
+    data.riwayat.push({
+      no: data.riwayat.length + 1,
+      nama: pemenang.nama,
+      tanggal: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }),
+      total: data.pengaturan.iuran * data.anggota.length
+    });
+    simpan();
+
+    // Tampilkan result box
+    document.getElementById('result-nama').textContent = '🏆 ' + pemenang.nama;
+    document.getElementById('result-sub').textContent =
+      `Mendapatkan arisan ke-${data.riwayat.length} • Rp ${(data.pengaturan.iuran * data.anggota.length).toLocaleString('id-ID')}`;
+    resultBox.classList.remove('hidden');
+
+    // Re-render tabung
+    setTimeout(renderTube, 1200);
+    renderBeranda();
+  }, duration + 100);
 }
 
 // ===== RIWAYAT =====
 function renderRiwayat() {
   const el = document.getElementById('list-riwayat');
-  if (data.riwayat.length === 0) {
-    el.innerHTML = '<p class="empty">Belum ada undian</p>';
-    return;
-  }
+  if (!data.riwayat.length) { el.innerHTML = '<p class="empty">Belum ada undian</p>'; return; }
   el.innerHTML = [...data.riwayat].reverse().map(r => `
     <div class="riwayat-item">
       <div class="riwayat-no">${r.no}</div>
       <div class="riwayat-info">
         <div class="nama">🏆 ${r.nama}</div>
-        <div class="tgl">${r.tanggal} — Rp ${r.iuran.toLocaleString('id-ID')}</div>
+        <div class="tgl">${r.tanggal} — Rp ${(r.total||0).toLocaleString('id-ID')}</div>
       </div>
     </div>
   `).join('');
@@ -148,22 +200,22 @@ function renderRiwayat() {
 function renderBeranda() {
   const total = data.anggota.length;
   const sudah = data.anggota.filter(a => a.sudahDapat).length;
-  const iuran = data.pengaturan.iuran;
   document.getElementById('total-anggota').textContent = total;
   document.getElementById('belum-dapat').textContent = total - sudah;
   document.getElementById('sudah-dapat').textContent = sudah;
-  document.getElementById('total-iuran').textContent = 'Rp ' + (iuran * total).toLocaleString('id-ID');
+  document.getElementById('total-iuran').textContent = 'Rp ' + (data.pengaturan.iuran * total).toLocaleString('id-ID');
   document.getElementById('nama-grup').value = data.pengaturan.nama;
   document.getElementById('iuran').value = data.pengaturan.iuran;
+  document.getElementById('subtitle-nama').textContent = data.pengaturan.nama;
 }
 
 // ===== RESET =====
 function resetArisan() {
-  if (!confirm('Reset semua data arisan untuk periode baru? Riwayat akan dihapus.')) return;
+  if (!confirm('Reset semua data untuk periode baru? Riwayat akan dihapus.')) return;
   data.anggota = data.anggota.map(a => ({ ...a, sudahDapat: false }));
   data.riwayat = [];
   simpan();
-  alert('✅ Arisan direset! Periode baru dimulai.');
+  alert('✅ Arisan direset!');
   renderAll();
 }
 
@@ -171,7 +223,7 @@ function renderAll() {
   renderBeranda();
   renderAnggota();
   renderRiwayat();
+  renderTube();
 }
 
-// Init
 renderAll();
