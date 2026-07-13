@@ -1,5 +1,5 @@
 // ===== CONFIG =====
-const API_URL = 'https://api.base44.com/api/apps/6a53414650bab26b159c7275/functions/arisanApi';
+const API_URL = 'https://api.base44.app/api/apps/6a53414650bab26b159c7275/functions/arisanApi';
 const ADMIN_WA = '6285811200013';
 const SPIN_DURATION = 10000;
 const CIRCUMFERENCE = 2 * Math.PI * 54;
