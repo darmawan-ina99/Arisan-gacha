@@ -10,37 +10,25 @@
   <div class="app">
     <header>
       <h1>🎰 Arisan Gacha</h1>
-      <p class="subtitle">Sistem Arisan Digital Otomatis</p>
+      <p class="subtitle" id="subtitle-nama">Sistem Arisan Digital Otomatis</p>
     </header>
 
     <nav class="tabs">
-      <button class="tab active" onclick="showTab('beranda')">🏠 Beranda</button>
-      <button class="tab" onclick="showTab('anggota')">👥 Anggota</button>
-      <button class="tab" onclick="showTab('undian')">🎯 Undian</button>
-      <button class="tab" onclick="showTab('riwayat')">📋 Riwayat</button>
+      <button class="tab active" data-tab="beranda" onclick="showTab('beranda',this)">🏠 Beranda</button>
+      <button class="tab" data-tab="anggota" onclick="showTab('anggota',this)">👥 Anggota</button>
+      <button class="tab" data-tab="undian" onclick="showTab('undian',this)">🎯 Undian</button>
+      <button class="tab" data-tab="riwayat" onclick="showTab('riwayat',this)">📋 Riwayat</button>
     </nav>
 
     <!-- BERANDA -->
     <div id="tab-beranda" class="tab-content active">
       <div class="card">
-        <h2>Info Arisan</h2>
+        <h2>📊 Info Arisan</h2>
         <div class="info-grid">
-          <div class="info-box">
-            <span class="label">Total Anggota</span>
-            <span class="value" id="total-anggota">0</span>
-          </div>
-          <div class="info-box">
-            <span class="label">Belum Dapat</span>
-            <span class="value" id="belum-dapat">0</span>
-          </div>
-          <div class="info-box">
-            <span class="label">Sudah Dapat</span>
-            <span class="value" id="sudah-dapat">0</span>
-          </div>
-          <div class="info-box">
-            <span class="label">Total Iuran</span>
-            <span class="value" id="total-iuran">Rp 0</span>
-          </div>
+          <div class="info-box"><span class="label">Total Anggota</span><span class="value" id="total-anggota">0</span></div>
+          <div class="info-box"><span class="label">Belum Dapat</span><span class="value" id="belum-dapat">0</span></div>
+          <div class="info-box"><span class="label">Sudah Dapat</span><span class="value" id="sudah-dapat">0</span></div>
+          <div class="info-box"><span class="label">Total Iuran</span><span class="value" id="total-iuran">Rp 0</span></div>
         </div>
       </div>
       <div class="card">
@@ -49,7 +37,7 @@
         <input type="text" id="nama-grup" placeholder="Contoh: Arisan RT 05" />
         <label>Iuran per Orang (Rp)</label>
         <input type="number" id="iuran" placeholder="500000" />
-        <button class="btn-primary" onclick="simpanPengaturan()">💾 Simpan</button>
+        <button class="btn-primary" onclick="simpanPengaturan()">💾 Simpan Pengaturan</button>
       </div>
     </div>
 
@@ -58,12 +46,12 @@
       <div class="card">
         <h2>➕ Tambah Anggota</h2>
         <input type="text" id="nama-anggota" placeholder="Nama anggota" />
-        <input type="text" id="no-hp" placeholder="No. HP / WhatsApp" />
-        <button class="btn-primary" onclick="tambahAnggota()">➕ Tambah</button>
+        <input type="text" id="no-hp" placeholder="No. HP / WhatsApp (opsional)" />
+        <button class="btn-primary" onclick="tambahAnggota()">➕ Tambah Anggota</button>
       </div>
       <div class="card">
         <h2>👥 Daftar Anggota</h2>
-        <div id="list-anggota"></div>
+        <div id="list-anggota"><p class="empty">Belum ada anggota</p></div>
       </div>
     </div>
 
@@ -71,11 +59,26 @@
     <div id="tab-undian" class="tab-content">
       <div class="card text-center">
         <h2>🎯 Undian Arisan</h2>
-        <div class="drum" id="drum">
-          <div class="drum-display" id="drum-display">?</div>
+        <p class="hint-text" id="hint-peserta"></p>
+
+        <!-- TABUNG -->
+        <div class="tube-wrapper">
+          <div class="tube-container">
+            <div class="tube-inner" id="tube-inner">
+              <!-- nama-nama diisi JS -->
+            </div>
+          </div>
+          <div class="tube-overlay top"></div>
+          <div class="tube-overlay bottom"></div>
+          <div class="tube-selector"></div>
         </div>
-        <button class="btn-gacha" id="btn-undian" onclick="mulaiUndian()">🎰 MULAI UNDIAN!</button>
-        <p id="status-undian" class="status-text"></p>
+
+        <button class="btn-gacha" id="btn-undian" onclick="mulaiUndian()">🎰 PUTAR TABUNG!</button>
+        <div id="result-box" class="result-box hidden">
+          <div class="confetti-text">🎉</div>
+          <p class="result-nama" id="result-nama"></p>
+          <p class="result-sub" id="result-sub"></p>
+        </div>
       </div>
     </div>
 
@@ -83,10 +86,10 @@
     <div id="tab-riwayat" class="tab-content">
       <div class="card">
         <h2>📋 Riwayat Pemenang</h2>
-        <div id="list-riwayat"></div>
+        <div id="list-riwayat"><p class="empty">Belum ada undian</p></div>
       </div>
       <div class="card">
-        <button class="btn-danger" onclick="resetArisan()">🔄 Reset Arisan (Periode Baru)</button>
+        <button class="btn-danger" onclick="resetArisan()">🔄 Reset (Periode Baru)</button>
       </div>
     </div>
   </div>
