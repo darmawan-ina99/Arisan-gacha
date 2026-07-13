@@ -14,10 +14,10 @@
     </header>
 
     <nav class="tabs">
-      <button class="tab active" data-tab="beranda" onclick="showTab('beranda',this)">🏠 Beranda</button>
-      <button class="tab" data-tab="anggota" onclick="showTab('anggota',this)">👥 Anggota</button>
-      <button class="tab" data-tab="undian" onclick="showTab('undian',this)">🎯 Undian</button>
-      <button class="tab" data-tab="riwayat" onclick="showTab('riwayat',this)">📋 Riwayat</button>
+      <button class="tab active" onclick="showTab('beranda',this)">🏠 Beranda</button>
+      <button class="tab" onclick="showTab('anggota',this)">👥 Anggota</button>
+      <button class="tab" onclick="showTab('undian',this)">🎯 Undian</button>
+      <button class="tab" onclick="showTab('riwayat',this)">📋 Riwayat</button>
     </nav>
 
     <!-- BERANDA -->
@@ -28,7 +28,7 @@
           <div class="info-box"><span class="label">Total Anggota</span><span class="value" id="total-anggota">0</span></div>
           <div class="info-box"><span class="label">Belum Dapat</span><span class="value" id="belum-dapat">0</span></div>
           <div class="info-box"><span class="label">Sudah Dapat</span><span class="value" id="sudah-dapat">0</span></div>
-          <div class="info-box"><span class="label">Total Iuran</span><span class="value" id="total-iuran">Rp 0</span></div>
+          <div class="info-box"><span class="label">Total Hadiah</span><span class="value" id="total-iuran">Rp 0</span></div>
         </div>
       </div>
       <div class="card">
@@ -37,18 +37,13 @@
         <input type="text" id="nama-grup" placeholder="Contoh: Arisan RT 05" />
         <label>Iuran per Orang (Rp)</label>
         <input type="number" id="iuran" placeholder="500000" />
-        <button class="btn-primary" onclick="simpanPengaturan()">💾 Simpan Pengaturan</button>
+        <button id="btn-simpan-setting" class="btn-primary" onclick="simpanPengaturan()" style="display:none">💾 Simpan Pengaturan</button>
       </div>
     </div>
 
     <!-- ANGGOTA -->
     <div id="tab-anggota" class="tab-content">
-      <div class="card">
-        <h2>➕ Tambah Anggota</h2>
-        <input type="text" id="nama-anggota" placeholder="Nama anggota" />
-        <input type="text" id="no-hp" placeholder="No. HP / WhatsApp (opsional)" />
-        <button class="btn-primary" onclick="tambahAnggota()">➕ Tambah Anggota</button>
-      </div>
+      <div id="form-admin"></div>
       <div class="card">
         <h2>👥 Daftar Anggota</h2>
         <div id="list-anggota"><p class="empty">Belum ada anggota</p></div>
@@ -61,12 +56,9 @@
         <h2>🎯 Undian Arisan</h2>
         <p class="hint-text" id="hint-peserta"></p>
 
-        <!-- TABUNG -->
         <div class="tube-wrapper">
           <div class="tube-container">
-            <div class="tube-inner" id="tube-inner">
-              <!-- nama-nama diisi JS -->
-            </div>
+            <div class="tube-inner" id="tube-inner"></div>
           </div>
           <div class="tube-overlay top"></div>
           <div class="tube-overlay bottom"></div>
@@ -74,10 +66,19 @@
         </div>
 
         <button class="btn-gacha" id="btn-undian" onclick="mulaiUndian()">🎰 PUTAR TABUNG!</button>
+
         <div id="result-box" class="result-box hidden">
           <div class="confetti-text">🎉</div>
           <p class="result-nama" id="result-nama"></p>
           <p class="result-sub" id="result-sub"></p>
+          <div class="result-actions">
+            <a id="btn-wa-pemenang" class="btn-wa-result" href="#" target="_blank" style="display:none">
+              💬 WhatsApp Pemenang
+            </a>
+            <a id="btn-wa-admin" class="btn-wa-result secondary" href="#" target="_blank">
+              📲 Kirim Notif ke Admin
+            </a>
+          </div>
         </div>
       </div>
     </div>
@@ -88,7 +89,7 @@
         <h2>📋 Riwayat Pemenang</h2>
         <div id="list-riwayat"><p class="empty">Belum ada undian</p></div>
       </div>
-      <div class="card">
+      <div class="card" id="card-reset" style="display:none">
         <button class="btn-danger" onclick="resetArisan()">🔄 Reset (Periode Baru)</button>
       </div>
     </div>
