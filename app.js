@@ -1,5 +1,5 @@
 // ===== CONFIG =====
-const API_URL = 'https://api.base44.app/api/apps/6a53414650bab26b159c7275/functions/arisanApi';
+const API_URL = 'https://api.base44.app/api/apps/6a5497f88dea110ab5e19b42/functions/arisanApi';
 const ADMIN_WA = '6285811200013';
 const SPIN_DURATION = 10000;
 const CIRCUMFERENCE = 2 * Math.PI * 54;
@@ -222,6 +222,8 @@ function renderBeranda() {
   if (iuEl) iuEl.value = data.pengaturan?.iuran || 500000;
   const btnSimpan = document.getElementById('btn-simpan-setting');
   if (btnSimpan) btnSimpan.style.display = isAdmin ? 'block' : 'none';
+  const btnLoginAdmin = document.getElementById('btn-login-admin');
+  if (btnLoginAdmin) btnLoginAdmin.style.display = isAdmin ? 'none' : 'block';
 }
 
 // ===== TABUNG =====
