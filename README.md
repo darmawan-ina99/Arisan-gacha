@@ -1,22 +1,18 @@
 # Arisan Gacha 🎰
 
-Aplikasi arisan digital dengan sistem **gacha live** yang transparan, seru, dan anti-setingan.
+Aplikasi Arisan Digital dengan sistem pengundian otomatis (gacha).
 
-## ✨ Fitur Utama
-- 🎮 Mesin Gacha dengan animasi 3D/2D
-- 🔒 Provably Fair (bisa diverifikasi)
-- 💬 Chat & stiker real-time
-- 📺 Live streaming kocokan
-- 🏆 Wall of Fame
+## Fitur
+- Buat grup arisan
+- Daftar anggota
+- Pengundian otomatis & adil
+- Riwayat pemenang
+- Manajemen iuran
 
-## 🛠️ Teknologi
-- Backend: Node.js + Firebase
-- Frontend: Flutter
-- Animasi: Unity WebGL
-- Randomizer: Chainlink VRF
+## Teknologi
+- HTML5, CSS3, JavaScript (Vanilla)
+- LocalStorage untuk penyimpanan data
+- Responsive design
 
-## 🚀 Status
-🚧 Dalam pengembangan Dharma-labs
-
-## 📝 Lisensi
-MIT License - lihat file [LICENSE](LICENSE)
+## Cara Pakai
+Buka `index.html` di browser atau deploy ke GitHub Pages.
