@@ -5,13 +5,16 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>Arisan Gacha 🎰</title>
   <link rel="stylesheet" href="style.css"/>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 </head>
 <body>
+<canvas id="confetti-canvas"></canvas>
 <div class="app">
-
   <header>
     <h1>🎰 Arisan Gacha</h1>
     <p class="subtitle" id="subtitle-nama">Sistem Arisan Digital</p>
+    <div class="live-badge">🟢 LIVE</div>
   </header>
 
   <nav class="tabs">
@@ -21,15 +24,37 @@
     <button class="tab"        onclick="showTab('riwayat',this)">📋 Riwayat</button>
   </nav>
 
+  <!-- SETUP FIREBASE -->
+  <div id="tab-setup" class="tab-content active setup-screen">
+    <div class="card setup-card">
+      <div class="setup-icon">🔥</div>
+      <h2>Hubungkan ke Database</h2>
+      <p class="setup-desc">Agar bisa diakses banyak perangkat secara bersamaan, masukkan Firebase config kamu.</p>
+      <label>Firebase Config (JSON)</label>
+      <textarea id="fb-config" rows="8" placeholder='{
+  "apiKey": "...",
+  "authDomain": "...",
+  "databaseURL": "...",
+  "projectId": "...",
+  "storageBucket": "...",
+  "messagingSenderId": "...",
+  "appId": "..."
+}'></textarea>
+      <button class="btn-primary" onclick="connectFirebase()">🔗 Hubungkan</button>
+      <div class="divider">atau</div>
+      <button class="btn-secondary" onclick="useLocal()">📱 Mode Lokal (1 perangkat)</button>
+    </div>
+  </div>
+
   <!-- BERANDA -->
-  <div id="tab-beranda" class="tab-content active">
+  <div id="tab-beranda" class="tab-content">
     <div class="card">
       <h2>📊 Info Arisan</h2>
       <div class="info-grid">
         <div class="info-box"><span class="label">Total Anggota</span><span class="value" id="total-anggota">0</span></div>
-        <div class="info-box"><span class="label">Belum Dapat</span><span class="value"  id="belum-dapat">0</span></div>
-        <div class="info-box"><span class="label">Sudah Dapat</span><span class="value"  id="sudah-dapat">0</span></div>
-        <div class="info-box"><span class="label">Total Hadiah</span><span class="value"  id="total-iuran">Rp 0</span></div>
+        <div class="info-box"><span class="label">Belum Dapat</span><span class="value" id="belum-dapat">0</span></div>
+        <div class="info-box"><span class="label">Sudah Dapat</span><span class="value" id="sudah-dapat">0</span></div>
+        <div class="info-box"><span class="label">Total Hadiah</span><span class="value" id="total-iuran">Rp 0</span></div>
       </div>
     </div>
     <div class="card">
@@ -38,6 +63,7 @@
       <input type="text" id="nama-grup" placeholder="Contoh: Arisan RT 05"/>
       <label>Iuran per Orang (Rp)</label>
       <input type="number" id="iuran" placeholder="500000"/>
+      <div id="mode-badge" class="mode-badge"></div>
       <button id="btn-simpan-setting" class="btn-primary" onclick="simpanPengaturan()" style="display:none">💾 Simpan Pengaturan</button>
     </div>
   </div>
@@ -57,21 +83,37 @@
       <h2>🎯 Undian Arisan</h2>
       <p class="hint-text" id="hint-peserta">Tambahkan anggota terlebih dahulu</p>
 
-      <div class="tube-wrapper">
+      <!-- COUNTDOWN TIMER -->
+      <div id="countdown-wrap" class="countdown-wrap hidden">
+        <div class="countdown-ring">
+          <svg class="countdown-svg" viewBox="0 0 120 120">
+            <circle class="ring-bg" cx="60" cy="60" r="54"/>
+            <circle class="ring-progress" id="ring-progress" cx="60" cy="60" r="54"/>
+          </svg>
+          <div class="countdown-number" id="countdown-number">10</div>
+          <div class="countdown-label">detik</div>
+        </div>
+        <div class="spinning-text" id="spinning-text">🎰 Mengundi...</div>
+      </div>
+
+      <div class="tube-wrapper" id="tube-wrapper">
         <div class="tube-container">
           <div class="tube-inner" id="tube-inner"></div>
         </div>
         <div class="tube-overlay top"></div>
         <div class="tube-overlay bottom"></div>
         <div class="tube-selector"></div>
+        <div class="tube-glow" id="tube-glow"></div>
       </div>
 
       <button class="btn-gacha" id="btn-undian" onclick="mulaiUndian()">🎰 PUTAR TABUNG!</button>
 
       <div id="result-box" class="result-box hidden">
+        <div class="fireworks">🎆</div>
         <div class="confetti-text">🎉</div>
+        <p class="result-title">PEMENANG ARISAN!</p>
         <p class="result-nama" id="result-nama"></p>
-        <p class="result-sub"  id="result-sub"></p>
+        <p class="result-sub" id="result-sub"></p>
         <div class="result-actions">
           <a id="btn-wa-pemenang" class="btn-wa-result" href="#" target="_blank" style="display:none">
             💬 WhatsApp Pemenang
