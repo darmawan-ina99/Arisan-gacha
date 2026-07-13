@@ -1,269 +1,66 @@
-* { box-sizing: border-box; margin: 0; padding: 0; }
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#667eea,#764ba2);min-height:100vh;padding:20px}
+.app{max-width:480px;margin:0 auto}
+header{text-align:center;color:#fff;padding:20px 0}
+header h1{font-size:2em}
+.subtitle{opacity:.8;margin-top:5px}
+.tabs{display:flex;background:rgba(255,255,255,.2);border-radius:12px;padding:5px;margin-bottom:20px;gap:4px}
+.tab{flex:1;padding:8px 4px;border:none;background:transparent;color:#fff;border-radius:8px;cursor:pointer;font-size:.75em;transition:all .3s}
+.tab.active{background:#fff;color:#764ba2;font-weight:700}
+.tab-content{display:none}.tab-content.active{display:block}
+.card{background:#fff;border-radius:16px;padding:20px;margin-bottom:15px;box-shadow:0 4px 15px rgba(0,0,0,.1)}
+.card h2{font-size:1.1em;color:#333;margin-bottom:15px}
+.card-header-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
+.card-header-row h2{margin:0}
+input{width:100%;padding:12px;border:2px solid #e0e0e0;border-radius:8px;font-size:1em;margin-bottom:10px;transition:border-color .3s}
+input:focus{outline:none;border-color:#764ba2}
+label{display:block;font-size:.85em;color:#666;margin-bottom:5px;margin-top:10px}
+.btn-primary{width:100%;padding:12px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;border-radius:8px;font-size:1em;cursor:pointer;margin-top:5px}
+.btn-danger{width:100%;padding:12px;background:#ff4757;color:#fff;border:none;border-radius:8px;font-size:1em;cursor:pointer}
+.btn-logout{padding:6px 14px;background:#ff4757;color:#fff;border:none;border-radius:20px;font-size:.8em;cursor:pointer}
+.admin-card{border:2px solid #764ba2}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.info-box{background:#f5f5f5;border-radius:10px;padding:15px;text-align:center}
+.info-box .label{display:block;font-size:.75em;color:#888;margin-bottom:5px}
+.info-box .value{font-size:1.4em;font-weight:700;color:#764ba2}
+.anggota-item{display:flex;align-items:center;padding:10px;border-bottom:1px solid #f0f0f0;gap:10px}
+.anggota-item:last-child{border-bottom:none}
+.avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;flex-shrink:0}
+.anggota-info{flex:1}.anggota-info .nama{font-weight:700;font-size:.95em}.anggota-info .hp{font-size:.8em;color:#888}
+.badge{padding:4px 10px;border-radius:20px;font-size:.75em;font-weight:700}
+.badge-belum{background:#fff3cd;color:#856404}.badge-sudah{background:#d4edda;color:#155724}
+.btn-hapus{background:none;border:none;color:#ff4757;cursor:pointer;font-size:1.2em}
+.text-center{text-align:center}
+.hint-text{color:#888;font-size:.85em;margin-bottom:15px}
+.empty{text-align:center;color:#aaa;padding:20px}
 
-body {
-  font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  min-height: 100vh;
-  padding: 20px;
-}
+/* TABUNG */
+.tube-wrapper{position:relative;width:240px;height:280px;margin:0 auto 25px}
+.tube-container{width:100%;height:100%;border-radius:120px;border:6px solid #764ba2;background:linear-gradient(180deg,#1a0533,#2d1066 50%,#1a0533);overflow:hidden;position:relative;box-shadow:0 0 30px rgba(118,75,162,.6),inset 0 0 20px rgba(0,0,0,.5)}
+.tube-inner{position:absolute;width:100%;display:flex;flex-direction:column;align-items:center}
+.tube-name-item{width:100%;height:56px;display:flex;align-items:center;justify-content:center;font-size:1em;font-weight:700;color:#fff;flex-shrink:0}
+.tube-overlay{position:absolute;left:0;right:0;height:90px;pointer-events:none;z-index:2}
+.tube-overlay.top{top:0;background:linear-gradient(to bottom,rgba(26,5,51,.95),transparent);border-radius:120px 120px 0 0}
+.tube-overlay.bottom{bottom:0;background:linear-gradient(to top,rgba(26,5,51,.95),transparent);border-radius:0 0 120px 120px}
+.tube-selector{position:absolute;left:10px;right:10px;top:50%;transform:translateY(-50%);height:58px;border:2px solid #f5c518;border-radius:8px;box-shadow:0 0 12px rgba(245,197,24,.5);z-index:3;pointer-events:none}
+.btn-gacha{padding:15px 40px;background:linear-gradient(135deg,#f093fb,#f5576c);color:#fff;border:none;border-radius:30px;font-size:1.1em;font-weight:700;cursor:pointer;box-shadow:0 4px 15px rgba(245,87,108,.4);transition:transform .2s;margin-bottom:20px}
+.btn-gacha:hover{transform:scale(1.05)}.btn-gacha:disabled{opacity:.6;cursor:not-allowed;transform:none}
 
-.app { max-width: 480px; margin: 0 auto; }
+/* RESULT */
+.result-box{background:linear-gradient(135deg,#667eea,#764ba2);border-radius:16px;padding:20px;color:#fff;margin-top:10px;animation:popIn .5s ease}
+.result-box.hidden{display:none}
+.confetti-text{font-size:2.5em;margin-bottom:8px}
+.result-nama{font-size:1.6em;font-weight:700;margin-bottom:5px}
+.result-sub{font-size:.85em;opacity:.85;margin-bottom:5px}
+.result-actions{display:flex;flex-direction:column;gap:10px;margin-top:15px}
+.btn-wa-result{display:flex;align-items:center;justify-content:center;padding:12px;border-radius:10px;background:#25D366;color:#fff;text-decoration:none;font-weight:700;font-size:.95em}
+.btn-wa-result.secondary{background:rgba(255,255,255,.2)}
 
-header { text-align: center; color: white; padding: 20px 0; }
-header h1 { font-size: 2em; }
-header .subtitle { opacity: 0.8; margin-top: 5px; }
+/* RIWAYAT */
+.riwayat-item{display:flex;align-items:center;padding:12px;border-bottom:1px solid #f0f0f0;gap:10px}
+.riwayat-item:last-child{border-bottom:none}
+.riwayat-no{width:35px;height:35px;border-radius:50%;background:#764ba2;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0}
+.riwayat-info{flex:1}.riwayat-info .nama{font-weight:700}.riwayat-info .tgl{font-size:.8em;color:#888}
+.btn-wa-kecil{padding:5px 12px;background:#25D366;color:#fff;border-radius:20px;text-decoration:none;font-size:.78em;font-weight:700;white-space:nowrap}
 
-.tabs {
-  display: flex;
-  background: rgba(255,255,255,0.2);
-  border-radius: 12px;
-  padding: 5px;
-  margin-bottom: 20px;
-  gap: 4px;
-}
-
-.tab {
-  flex: 1;
-  padding: 8px 4px;
-  border: none;
-  background: transparent;
-  color: white;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 0.75em;
-  transition: all 0.3s;
-}
-.tab.active { background: white; color: #764ba2; font-weight: bold; }
-
-.tab-content { display: none; }
-.tab-content.active { display: block; }
-
-.card {
-  background: white;
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 15px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-}
-.card h2 { font-size: 1.1em; color: #333; margin-bottom: 15px; }
-
-input {
-  width: 100%;
-  padding: 12px;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
-  font-size: 1em;
-  margin-bottom: 10px;
-  transition: border-color 0.3s;
-}
-input:focus { outline: none; border-color: #764ba2; }
-
-label { display: block; font-size: 0.85em; color: #666; margin-bottom: 5px; margin-top: 10px; }
-
-.btn-primary {
-  width: 100%; padding: 12px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white; border: none; border-radius: 8px;
-  font-size: 1em; cursor: pointer; margin-top: 5px;
-}
-.btn-danger {
-  width: 100%; padding: 12px;
-  background: #ff4757; color: white; border: none;
-  border-radius: 8px; font-size: 1em; cursor: pointer;
-}
-
-.info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.info-box { background: #f5f5f5; border-radius: 10px; padding: 15px; text-align: center; }
-.info-box .label { display: block; font-size: 0.75em; color: #888; margin-bottom: 5px; }
-.info-box .value { font-size: 1.4em; font-weight: bold; color: #764ba2; }
-
-.anggota-item {
-  display: flex; align-items: center;
-  padding: 10px; border-bottom: 1px solid #f0f0f0; gap: 10px;
-}
-.anggota-item:last-child { border-bottom: none; }
-.avatar {
-  width: 40px; height: 40px; border-radius: 50%;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  display: flex; align-items: center; justify-content: center;
-  color: white; font-weight: bold; flex-shrink: 0;
-}
-.anggota-info { flex: 1; }
-.anggota-info .nama { font-weight: bold; font-size: 0.95em; }
-.anggota-info .hp { font-size: 0.8em; color: #888; }
-.badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75em; font-weight: bold; }
-.badge-belum { background: #fff3cd; color: #856404; }
-.badge-sudah { background: #d4edda; color: #155724; }
-.btn-hapus { background: none; border: none; color: #ff4757; cursor: pointer; font-size: 1.2em; }
-
-/* ====== TABUNG ====== */
-.text-center { text-align: center; }
-
-.hint-text { color: #888; font-size: 0.85em; margin-bottom: 15px; }
-
-.tube-wrapper {
-  position: relative;
-  width: 240px;
-  height: 280px;
-  margin: 0 auto 25px;
-}
-
-.tube-container {
-  width: 100%;
-  height: 100%;
-  border-radius: 120px;
-  border: 6px solid #764ba2;
-  background: linear-gradient(180deg, #1a0533 0%, #2d1066 50%, #1a0533 100%);
-  overflow: hidden;
-  position: relative;
-  box-shadow: 0 0 30px rgba(118,75,162,0.6), inset 0 0 20px rgba(0,0,0,0.5);
-}
-
-.tube-inner {
-  position: absolute;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  transition: none;
-}
-
-.tube-name-item {
-  width: 100%;
-  height: 56px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1em;
-  font-weight: bold;
-  color: #fff;
-  letter-spacing: 0.5px;
-  flex-shrink: 0;
-}
-
-.tube-name-item.highlight {
-  color: #f5c518;
-  font-size: 1.15em;
-  text-shadow: 0 0 10px #f5c518;
-}
-
-.tube-overlay {
-  position: absolute;
-  left: 0; right: 0;
-  height: 90px;
-  pointer-events: none;
-  z-index: 2;
-}
-.tube-overlay.top {
-  top: 0;
-  background: linear-gradient(to bottom, rgba(26,5,51,0.95), transparent);
-  border-radius: 120px 120px 0 0;
-}
-.tube-overlay.bottom {
-  bottom: 0;
-  background: linear-gradient(to top, rgba(26,5,51,0.95), transparent);
-  border-radius: 0 0 120px 120px;
-}
-
-.tube-selector {
-  position: absolute;
-  left: 10px; right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  height: 58px;
-  border: 2px solid #f5c518;
-  border-radius: 8px;
-  box-shadow: 0 0 12px rgba(245,197,24,0.5);
-  z-index: 3;
-  pointer-events: none;
-}
-
-.btn-gacha {
-  padding: 15px 40px;
-  background: linear-gradient(135deg, #f093fb, #f5576c);
-  color: white; border: none; border-radius: 30px;
-  font-size: 1.1em; font-weight: bold; cursor: pointer;
-  box-shadow: 0 4px 15px rgba(245,87,108,0.4);
-  transition: transform 0.2s;
-  margin-bottom: 20px;
-}
-.btn-gacha:hover { transform: scale(1.05); }
-.btn-gacha:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-
-.result-box {
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  border-radius: 16px;
-  padding: 20px;
-  color: white;
-  margin-top: 10px;
-  animation: popIn 0.5s ease;
-}
-.result-box.hidden { display: none; }
-.confetti-text { font-size: 2.5em; margin-bottom: 8px; }
-.result-nama { font-size: 1.6em; font-weight: bold; margin-bottom: 5px; }
-.result-sub { font-size: 0.9em; opacity: 0.85; }
-
-@keyframes popIn {
-  0% { transform: scale(0.5); opacity: 0; }
-  70% { transform: scale(1.1); }
-  100% { transform: scale(1); opacity: 1; }
-}
-
-/* riwayat */
-.riwayat-item {
-  display: flex; align-items: center;
-  padding: 12px; border-bottom: 1px solid #f0f0f0; gap: 10px;
-}
-.riwayat-item:last-child { border-bottom: none; }
-.riwayat-no {
-  width: 35px; height: 35px; border-radius: 50%;
-  background: #764ba2; color: white;
-  display: flex; align-items: center; justify-content: center;
-  font-weight: bold; flex-shrink: 0;
-}
-.riwayat-info .nama { font-weight: bold; }
-.riwayat-info .tgl { font-size: 0.8em; color: #888; }
-.empty { text-align: center; color: #aaa; padding: 20px; }
-
-/* ====== ADMIN ====== */
-.admin-card { border: 2px solid #764ba2; }
-.admin-badge {
-  background: #764ba2; color: white;
-  padding: 6px 12px; border-radius: 20px;
-  font-size: 0.8em; font-weight: bold;
-  display: inline-block; margin-bottom: 12px;
-}
-.admin-badge.viewer {
-  background: #f0f0f0; color: #666;
-}
-.admin-badge.viewer a { color: #764ba2; font-weight: bold; }
-
-.btn-logout {
-  padding: 6px 14px;
-  background: #ff4757; color: white;
-  border: none; border-radius: 20px;
-  font-size: 0.8em; cursor: pointer;
-}
-
-/* ====== RESULT WA BUTTONS ====== */
-.result-actions {
-  display: flex; flex-direction: column; gap: 10px;
-  margin-top: 15px;
-}
-.btn-wa-result {
-  display: flex; align-items: center; justify-content: center;
-  padding: 12px; border-radius: 10px;
-  background: #25D366; color: white;
-  text-decoration: none; font-weight: bold;
-  font-size: 0.95em;
-}
-.btn-wa-result.secondary { background: rgba(255,255,255,0.2); }
-
-/* ====== RIWAYAT WA BUTTON ====== */
-.btn-wa-kecil {
-  padding: 5px 12px;
-  background: #25D366; color: white;
-  border-radius: 20px; text-decoration: none;
-  font-size: 0.78em; font-weight: bold;
-  white-space: nowrap;
-}
+@keyframes popIn{0%{transform:scale(.5);opacity:0}70%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
