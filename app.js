@@ -1,5 +1,5 @@
 // ===== KONFIGURASI =====
-const ADMIN_PIN = '1234'; // PIN admin default, bisa diganti
+const ADMIN_PIN = '0021'; // PIN admin default, bisa diganti
 const ADMIN_WA = '6285811200013'; // WhatsApp admin (Wawan)
 
 // ===== DATA =====
