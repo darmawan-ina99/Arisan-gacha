@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Arisan Gacha 🎰</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- LOADING SCREEN -->
+  <div id="loading-screen" style="position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9998;color:#fff">
+    <div style="font-size:3em;animation:spin 1s linear infinite">🎰</div>
+    <div style="margin-top:15px;font-size:1.1em;font-weight:700">Memuat Arisan Gacha...</div>
+    <div style="margin-top:8px;font-size:.8em;opacity:.6">Menghubungkan ke server</div>
+  </div>
+
+  <noscript>
+    <div style="position:fixed;top:0;left:0;width:100%;height:100%;background:#fff;display:flex;align-items:center;justify-content:center;z-index:9999;color:#333;font-size:1.2rem;text-align:center;padding:20px;">
+      ⚠️ Aplikasi ini membutuhkan JavaScript. Aktifkan JavaScript di browser Anda.
+    </div>
+  </noscript>
+
+  <div class="app">
+    <header>
+      <h1>🎰 Arisan Gacha</h1>
+      <p class="subtitle" id="subtitle-nama">Sistem Arisan Digital</p>
+      <div class="live-badge">🟢 LIVE · Multi Perangkat</div>
+    </header>
+
+    <nav class="tabs" role="tablist">
+      <button class="tab active" role="tab" aria-selected="true" onclick="showTab('beranda',this)">🏠 Beranda</button>
+      <button class="tab" role="tab" aria-selected="false" onclick="showTab('anggota',this)">👥 Anggota</button>
+      <button class="tab" role="tab" aria-selected="false" onclick="showTab('undian',this)">🎯 Undian</button>
+      <button class="tab" role="tab" aria-selected="false" onclick="showTab('riwayat',this)">📋 Riwayat</button>
+    </nav>
+
+    <!-- BERANDA -->
+    <section id="tab-beranda" class="tab-content active" role="tabpanel">
+      <div class="card">
+        <h2>📊 Info Arisan</h2>
+        <div class="info-grid">
+          <div class="info-box"><span class="label">Total Anggota</span><span class="value" id="total-anggota">0</span></div>
+          <div class="info-box"><span class="label">Belum Dapat</span><span class="value" id="belum-dapat">0</span></div>
+          <div class="info-box"><span class="label">Sudah Dapat</span><span class="value" id="sudah-dapat">0</span></div>
+          <div class="info-box"><span class="label">Total Hadiah</span><span class="value" id="total-iuran">Rp 0</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>⚙️ Pengaturan</h2>
+        <label for="nama-grup">Nama Grup</label>
+        <input type="text" id="nama-grup" placeholder="Contoh: Arisan RT 05" />
+        <label for="iuran">Iuran per Orang (Rp)</label>
+        <input type="number" id="iuran" placeholder="500000" />
+        <button type="button" class="btn-primary" id="btn-simpan-setting" onclick="simpanPengaturan()" style="display:none">💾 Simpan Pengaturan</button>
+        <button type="button" class="btn-secondary" onclick="cekAdmin()" style="margin-top:10px">🔑 Login Admin</button>
+      </div>
+    </section>
+
+    <!-- ANGGOTA -->
+    <section id="tab-anggota" class="tab-content" role="tabpanel">
+      <div id="form-admin"></div>
+      <div class="card">
+        <h2>👥 Daftar Anggota</h2>
+        <div id="list-anggota"><p class="empty">Memuat...</p></div>
+      </div>
+    </section>
+
+    <!-- UNDIAN -->
+    <section id="tab-undian" class="tab-content" role="tabpanel">
+      <div class="card text-center">
+        <h2>🎯 Undian Arisan</h2>
+        <p class="hint-text" id="hint-peserta">Tambahkan anggota terlebih dahulu</p>
+
+        <div id="countdown-wrap" class="countdown-wrap hidden">
+          <div class="countdown-ring">
+            <svg class="countdown-svg" viewBox="0 0 120 120">
+              <circle class="ring-bg" cx="60" cy="60" r="54" />
+              <circle class="ring-progress" id="ring-progress" cx="60" cy="60" r="54" />
+            </svg>
+            <div class="countdown-number" id="countdown-number">10</div>
+            <div class="countdown-label">detik</div>
+          </div>
+          <div class="spinning-text">🎰 Mengundi...</div>
+        </div>
+
+        <div class="tube-wrapper" id="tube-wrapper">
+          <div class="tube-container">
+            <div class="tube-inner" id="tube-inner"></div>
+          </div>
+          <div class="tube-overlay top"></div>
+          <div class="tube-overlay bottom"></div>
+          <div class="tube-selector"></div>
+          <div class="tube-glow" id="tube-glow"></div>
+        </div>
+
+        <button type="button" class="btn-gacha" id="btn-undian" onclick="mulaiUndian()">🎰 PUTAR TABUNG!</button>
+
+        <div id="result-box" class="result-box hidden">
+          <div class="fireworks">🎆</div>
+          <div class="confetti-text">🎉</div>
+          <p class="result-title">PEMENANG ARISAN!</p>
+          <p class="result-nama" id="result-nama"></p>
+          <p class="result-sub" id="result-sub"></p>
+          <div class="result-actions">
+            <a id="btn-wa-pemenang" class="btn-wa-result" href="#" target="_blank" style="display:none">💬 WhatsApp Pemenang</a>
+            <a id="btn-wa-admin" class="btn-wa-result secondary" href="#" target="_blank">📲 Kirim Notif ke Admin</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIWAYAT -->
+    <section id="tab-riwayat" class="tab-content" role="tabpanel">
+      <div class="card">
+        <h2>📋 Riwayat Pemenang</h2>
+        <div id="list-riwayat"><p class="empty">Belum ada undian</p></div>
+      </div>
+      <div class="card" id="card-reset" style="display:none">
+        <button type="button" class="btn-danger" onclick="resetArisan()">🔄 Reset (Periode Baru)</button>
+      </div>
+    </section>
+  </div>
+
+  <script src="app.js?v=1784190140" defer></script>
+</body>
+  </html>
