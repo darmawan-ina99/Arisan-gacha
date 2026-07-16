@@ -134,14 +134,21 @@ function showTab(tab, el) {
 
 // ===== PENGATURAN =====
 async function simpanPengaturan() {
-  if (!isAdmin) return cekAdmin();
   const nama  = document.getElementById('nama-grup').value.trim();
   const iuran = parseInt(document.getElementById('iuran').value) || 500000;
   if (!nama) return alert('Nama grup harus diisi!');
+  if (!isAdmin) {
+    const pin = prompt('Masukkan PIN Admin untuk menyimpan:');
+    if (pin === null) return;
+    const res = await api('verifyPin', { pin });
+    if (!res.ok) return alert('❌ PIN salah! Perubahan tidak disimpan.');
+    isAdmin = true;
+    localStorage.setItem('admin-session', Date.now());
+  }
   await api('saveGrup', { nama, iuran, admin_pin: '0021' });
   data.pengaturan = { nama, iuran };
-  renderBeranda();
-  alert('✅ Pengaturan disimpan!');
+  renderAll();
+  alert('✅ Pengaturan berhasil disimpan!');
 }
 
 // ===== ANGGOTA =====
@@ -221,7 +228,7 @@ function renderBeranda() {
   if (ngEl) ngEl.value = data.pengaturan?.nama || '';
   if (iuEl) iuEl.value = data.pengaturan?.iuran || 500000;
   const btnSimpan = document.getElementById('btn-simpan-setting');
-  if (btnSimpan) btnSimpan.style.display = isAdmin ? 'block' : 'none';
+  if (btnSimpan) btnSimpan.style.display = 'block';
   const btnLoginAdmin = document.getElementById('btn-login-admin');
   if (btnLoginAdmin) btnLoginAdmin.style.display = isAdmin ? 'none' : 'block';
 }
