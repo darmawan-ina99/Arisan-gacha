@@ -400,19 +400,28 @@ async function mulaiUndian() {
   tube.style.transform = `translateY(${CENTER * ITEM_H}px)`;
   tube.getBoundingClientRect();
 
+  // start halus: fade-in nama + kick tabung + blur gerak
+  tube.classList.remove('fadein', 'blurRamp', 'settle');
+  void tube.offsetWidth;
+  tube.classList.add('fadein', 'blurRamp');
+  const tubeBox = document.querySelector('.tube-container');
+  tubeBox.classList.remove('kick');
+  void tubeBox.offsetWidth;
+  tubeBox.classList.add('kick');
+
   startCountdown(10);
 
   const targetY = (CENTER - (pool.length - 1)) * ITEM_H;
-  tube.style.transition = `transform 7000ms cubic-bezier(0.1,0.5,0.1,1.0)`;
+  tube.style.transition = `transform ${SPIN_DURATION}ms cubic-bezier(0.16,0.55,0.12,1.0)`;
   tube.style.transform = `translateY(${targetY}px)`;
-  setTimeout(() => {
-    tube.style.transition = `transform 3000ms cubic-bezier(0.05,0.9,0.1,1.0)`;
-    tube.style.transform = `translateY(${targetY}px)`;
-  }, 7000);
 
   setTimeout(async () => {
-    await finishUndian(pemenang, btn, tubeGlow);
-  }, SPIN_DURATION + 300);
+    tube.style.setProperty('--ty', targetY + 'px');
+    tube.classList.add('settle');
+    setTimeout(async () => {
+      await finishUndian(pemenang, btn, tubeGlow);
+    }, 450);
+  }, SPIN_DURATION);
 }
 
 async function finishUndian(pemenang, btn, tubeGlow) {
